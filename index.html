@@ -34,11 +34,13 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
   const phone = document.getElementById('phone').value;
   const uuid = getUUID();
 
-  const res = await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({uuid, name, email, phone}),
-    headers: {"Content-Type": "application/json"}
-  });
+  await fetch(API_URL, {
+  method: "POST",
+  mode: "cors",
+  headers: {"Content-Type": "application/json"},
+  body: JSON.stringify({uuid, name, email, phone})
+});
+
 
   const data = await res.json();
   document.getElementById('status').innerText = "Kayıt / yoklama alındı!";
@@ -47,5 +49,6 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
 </script>
 </body>
 </html>
+
 
 
