@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   try {
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYHzA9ebmXQ9d8F_i91FF4dbY7CaAXWKeO-LqAvoy1ZoyURMW3u-kGSFjsaMAnJ7-z/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwtTlkGy5KGZ624q1LeiM-Qy-FjCIozx8i_GgEN7mMw3ZqLSq68QbHyYGZTJKXJ312-/exec";
 
     const response = await fetch(APPS_SCRIPT_URL, {
       method: "POST",
@@ -20,3 +20,4 @@ export default async function handler(req, res) {
     res.status(500).send(JSON.stringify({message:"Proxy error"}));
   }
 }
+
