@@ -86,23 +86,26 @@ async function sendAttendance(data) {
       body: JSON.stringify(data)
     });
 
+    // Body'yi tek seferde oku
+    const text = await res.text();
+
     let json;
     try {
-      json = await res.json(); // JSON parse
+      json = JSON.parse(text); // JSON parse
     } catch(err) {
-      // JSON parse edemezse fallback
-      const text = await res.text();
       console.log("Fallback text:", text);
       statusEl.innerText = "Yoklama kaydı alındı ✅";
       return;
     }
 
     statusEl.innerText = json.message || "Yoklama kaydı alındı ✅";
+
   } catch(err) {
     console.error(err);
     statusEl.innerText = "Hata oluştu ❌";
   }
 }
+
 
 
 window.onload = () => {
@@ -130,4 +133,5 @@ window.onload = () => {
 </script>
 </body>
 </html>
+
 
