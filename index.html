@@ -1,86 +1,83 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Yoklama Sistemi</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 400px;
-      margin: auto;
-      padding: 20px;
-    }
-    input, button {
-      width: 100%;
-      padding: 8px;
-      margin-top: 10px;
-      box-sizing: border-box;
-    }
-    #status {
-      margin-top: 15px;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yoklama Sistemi</title>
+<style>
+  body { font-family: Arial,sans-serif; text-align:center; margin-top:50px; }
+  input, button { padding:10px; margin-top:10px; width:250px; }
+  #status { margin-top:15px; font-weight:bold; }
+  #registerForm { display:none; }
+</style>
 </head>
 <body>
-  <h1>Yoklama</h1>
-  <form id="registerForm">
-    <input type="text" id="name" placeholder="Ad Soyad" required><br>
-    <input type="email" id="email" placeholder="E-posta" required><br>
-    <input type="text" id="phone" placeholder="Telefon" required><br>
-    <button type="submit">Gönder</button>
-  </form>
-  <p id="status"></p>
+<h1>Yoklama Sistemi</h1>
+
+<form id="registerForm">
+  <input type="text" id="name" placeholder="Ad Soyad" required><br>
+  <input type="email" id="email" placeholder="E-posta" required><br>
+  <input type="text" id="phone" placeholder="Telefon" required><br>
+  <button type="submit">Kaydet ve Yoklamayı Al</button>
+</form>
+
+<p id="status">Kontrol ediliyor...</p>
 
 <script>
-  // Vercel API endpoint’in
-  const API_URL = "https://yoklama-peach.vercel.app/api/yoklama"; // kendi Vercel domainine göre değiştir
+const API_URL = "https://yoklama-peach.vercel.app/api/yoklama";
 
-  // Kullanıcının cihaz kimliğini localStorage’da saklıyoruz
-  function getUUID() {
-    let uuid = localStorage.getItem("device_uuid");
-    if (!uuid) {
-      // Modern tarayıcılarda crypto.randomUUID() var
-      uuid = (crypto.randomUUID) ? crypto.randomUUID() :
-        'xxxx-xxxx-4xxx-yxxx-xxxx'.replace(/[xy]/g, function(c) {
-          var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
-        });
-      localStorage.setItem("device_uuid", uuid);
-    }
-    return uuid;
+function getUUID() {
+  let uuid = localStorage.getItem("device_uuid");
+  if (!uuid) {
+    uuid = (crypto.randomUUID) ? crypto.randomUUID() :
+      'xxxx-xxxx-4xxx-yxxx-xxxx'.replace(/[xy]/g,function(c){
+        var r=Math.random()*16|0,v=c==='x'?r:(r&0x3|0x8);return v.toString(16);
+      });
+    localStorage.setItem("device_uuid", uuid);
+  }
+  return uuid;
+}
+
+async function sendAttendance(data) {
+  const statusEl = document.getElementById('status');
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    statusEl.innerText = json.message || "Yoklama kaydı alındı ✅";
+  } catch(err) {
+    console.error(err);
+    statusEl.innerText = "Hata oluştu ❌";
+  }
+}
+
+window.onload = () => {
+  const uuid = getUUID();
+  const form = document.getElementById('registerForm');
+
+  // Eğer UUID yeni ise formu göster
+  if (!localStorage.getItem("hasRegistered")) {
+    form.style.display = "block";
+    document.getElementById('status').innerText = "Lütfen kayıt olun";
+  } else {
+    // Daha önce kayıt olmuşsa direkt yoklama gönder
+    sendAttendance({uuid});
   }
 
-  document.getElementById('registerForm').addEventListener('submit', async (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const name = document.getElementById('name').value.trim();
     const email = document.getElementById('email').value.trim();
     const phone = document.getElementById('phone').value.trim();
-    const uuid = getUUID();
 
-    document.getElementById('status').innerText = "Gönderiliyor...";
-
-    try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({uuid, name, email, phone})
-      });
-
-      if (!res.ok) throw new Error("Sunucu hatası");
-
-      const text = await res.text();
-      console.log("API yanıtı:", text);
-
-      document.getElementById('status').innerText = "Kayıt / yoklama alındı!";
-      document.getElementById('registerForm').reset();
-    } catch (err) {
-      console.error(err);
-      document.getElementById('status').innerText = "Bir hata oluştu. Lütfen tekrar deneyin.";
-    }
+    await sendAttendance({uuid, name, email, phone});
+    localStorage.setItem("hasRegistered", "true");
+    form.style.display = "none";
   });
+};
 </script>
 </body>
 </html>
