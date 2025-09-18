@@ -46,13 +46,17 @@ async function sendAttendance(data) {
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(data)
     });
+    
+    // JSON parse ediyoruz
     const json = await res.json();
     statusEl.innerText = json.message || "Yoklama kaydı alındı ✅";
+
   } catch(err) {
     console.error(err);
     statusEl.innerText = "Hata oluştu ❌";
   }
 }
+
 
 window.onload = () => {
   const uuid = getUUID();
@@ -81,3 +85,4 @@ window.onload = () => {
 </script>
 </body>
 </html>
+
