@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yoklama</title>
+</head>
+<body style="font-family:sans-serif;max-width:400px;margin:auto;">
+  <h1>Yoklama</h1>
+  <form id="registerForm">
+    <input type="text" id="name" placeholder="Ad Soyad" required><br><br>
+    <input type="email" id="email" placeholder="E-posta" required><br><br>
+    <input type="text" id="phone" placeholder="Telefon" required><br><br>
+    <button type="submit">Gönder</button>
+  </form>
+  <p id="status"></p>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzFkbABFvBVrcznFBQA6uWnJ7D3BOLSq9MyXQGU81jmFz9x28xbPch3J5Y5ov0zHi29/exec"; 
+
+function getUUID() {
+  let uuid = localStorage.getItem("device_uuid");
+  if (!uuid) {
+    uuid = crypto.randomUUID();
+    localStorage.setItem("device_uuid", uuid);
+  }
+  return uuid;
+}
+
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const phone = document.getElementById('phone').value;
+  const uuid = getUUID();
+
+  const res = await fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({uuid, name, email, phone}),
+    headers: {"Content-Type": "application/json"}
+  });
+
+  const data = await res.json();
+  document.getElementById('status').innerText = "Kayıt / yoklama alındı!";
+  document.getElementById('registerForm').reset();
+});
+</script>
+</body>
+</html>
