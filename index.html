@@ -94,11 +94,11 @@ async function sendAttendance(data) {
       json = JSON.parse(text); // JSON parse
     } catch(err) {
       console.log("Fallback text:", text);
-      statusEl.innerText = "Yoklama kaydı alındı ✅";
+      statusEl.innerText = "Yoklama kaydı alındı, Sohbetimize Hoş Geldiniz ✅";
       return;
     }
 
-    statusEl.innerText = json.message || "Yoklama kaydı alındı ✅";
+    statusEl.innerText = json.message || "Yoklama kaydı alındı Sohbetimize Hoş Geldiniz ✅";
 
   } catch(err) {
     console.error(err);
